@@ -1,15 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { type Realm, realms } from "@/lib/realms";
 import { cn } from "@/lib/utils";
-
-interface RealmMapProps {
-  onRealmSelect: (realm: Realm | null) => void;
-  selectedRealm: Realm | null;
-}
 
 // Map realm IDs to their positions in the 2x3 grid layout of the illustration
 const realmPositions: Record<string, { x: number; y: number; width: number; height: number }> = {
@@ -31,7 +26,8 @@ const realmColors: Record<string, { glow: string; accent: string }> = {
   "mountain-of-meaning": { glow: "from-slate-400/30 via-zinc-300/20 to-stone-400/30", accent: "border-slate-400/50" },
 };
 
-export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
+export function RealmMap() {
+  const router = useRouter();
   const [hoveredRealm, setHoveredRealm] = useState<Realm | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,10 +46,8 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
   };
 
   const handleClick = (realm: Realm) => {
-    onRealmSelect(selectedRealm?.id === realm.id ? null : realm);
+    router.push(`/realms/${realm.id}`);
   };
-
-  const activeRealm = hoveredRealm || selectedRealm;
 
   return (
     <div className="relative w-full max-w-5xl mx-auto" ref={containerRef}>
@@ -77,7 +71,6 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
             const pos = realmPositions[realm.id];
             const colors = realmColors[realm.id];
             const isHovered = hoveredRealm?.id === realm.id;
-            const isSelected = selectedRealm?.id === realm.id;
 
             return (
               <button
@@ -102,11 +95,10 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
                     "absolute inset-0 transition-all duration-700 rounded-lg",
                     "opacity-0 blur-xl",
                     isHovered && "opacity-100",
-                    isSelected && "opacity-80",
                     `bg-gradient-radial ${colors.glow}`
                   )}
                   style={{
-                    background: isHovered || isSelected 
+                    background: isHovered 
                       ? `radial-gradient(ellipse at center, ${
                           realm.id === "ocean-of-being" ? "rgba(34, 211, 238, 0.25)" :
                           realm.id === "theatre-of-perception" ? "rgba(192, 132, 252, 0.25)" :
@@ -125,11 +117,10 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
                     "absolute inset-2 rounded-xl transition-all duration-500",
                     "border-2 border-transparent",
                     isHovered && cn("border-opacity-60", colors.accent),
-                    isSelected && cn("border-opacity-80", colors.accent),
-                    (isHovered || isSelected) && "shadow-inner"
+                    isHovered && "shadow-inner"
                   )}
                   style={{
-                    boxShadow: isHovered || isSelected 
+                    boxShadow: isHovered 
                       ? `inset 0 0 30px ${
                           realm.id === "ocean-of-being" ? "rgba(34, 211, 238, 0.15)" :
                           realm.id === "theatre-of-perception" ? "rgba(192, 132, 252, 0.15)" :
@@ -143,7 +134,7 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
                 />
 
                 {/* Mystical particle effect on hover - small floating dots */}
-                {(isHovered || isSelected) && (
+                {isHovered && (
                   <div className="absolute inset-0 overflow-hidden rounded-xl">
                     {[...Array(6)].map((_, i) => (
                       <div
@@ -272,7 +263,7 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
       {/* Realm indicator dots below image */}
       <div className="mt-6 flex items-center justify-center gap-3">
         {realms.map((realm) => {
-          const isActive = activeRealm?.id === realm.id;
+          const isActive = hoveredRealm?.id === realm.id;
           return (
             <div
               key={realm.id}
@@ -306,44 +297,6 @@ export function RealmMap({ onRealmSelect, selectedRealm }: RealmMapProps) {
         })}
       </div>
 
-      {/* Currently selected realm name with link */}
-      {activeRealm && (
-        <div className="mt-4 text-center">
-          <Link 
-            href={`/realms/${activeRealm.id}`}
-            className={cn(
-              "inline-flex items-center gap-2 px-4 py-2 rounded-full",
-              "transition-all duration-300 hover:scale-105",
-              "border backdrop-blur-sm"
-            )}
-            style={{
-              borderColor: activeRealm.id === "ocean-of-being" ? "rgba(34, 211, 238, 0.3)" :
-                activeRealm.id === "theatre-of-perception" ? "rgba(192, 132, 252, 0.3)" :
-                activeRealm.id === "forge-of-thought" ? "rgba(251, 191, 36, 0.3)" :
-                activeRealm.id === "field-of-emotion" ? "rgba(251, 113, 133, 0.3)" :
-                activeRealm.id === "path-of-action" ? "rgba(52, 211, 153, 0.3)" :
-                "rgba(148, 163, 184, 0.3)",
-              backgroundColor: "rgba(0, 0, 0, 0.3)"
-            }}
-          >
-            <span>{activeRealm.icon}</span>
-            <span className="text-foreground font-medium">{activeRealm.name}</span>
-            <span 
-              className="text-xs"
-              style={{
-                color: activeRealm.id === "ocean-of-being" ? "rgb(34, 211, 238)" :
-                  activeRealm.id === "theatre-of-perception" ? "rgb(192, 132, 252)" :
-                  activeRealm.id === "forge-of-thought" ? "rgb(251, 191, 36)" :
-                  activeRealm.id === "field-of-emotion" ? "rgb(251, 113, 133)" :
-                  activeRealm.id === "path-of-action" ? "rgb(52, 211, 153)" :
-                  "rgb(148, 163, 184)"
-              }}
-            >
-              Enter
-            </span>
-          </Link>
-        </div>
-      )}
     </div>
   );
 }

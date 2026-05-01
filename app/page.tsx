@@ -1,23 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { realms, type Realm } from "@/lib/realms";
 import { RealmMap } from "@/components/realm-map";
-import { AtmospherePanel } from "@/components/atmosphere-panel";
 import { RealmInput } from "@/components/realm-input";
 
 export default function HomePage() {
-  const [selectedRealm, setSelectedRealm] = useState<Realm | null>(null);
   const [destination, setDestination] = useState("");
-
-  const handleRealmSelect = (realm: Realm | null) => {
-    setSelectedRealm(realm);
-  };
 
   const handleEnterRealm = () => {
     // This will later connect to an AI guide and quest system
     console.log("[v0] Entering realm with destination:", destination);
-    console.log("[v0] Selected realm:", selectedRealm?.name);
   };
 
   return (
@@ -83,19 +75,11 @@ export default function HomePage() {
           </header>
 
           {/* Interactive Realm Map */}
-          <section aria-labelledby="realms-heading" className="mb-8">
+          <section aria-labelledby="realms-heading" className="mb-10">
             <h2 id="realms-heading" className="sr-only">
               Explore the Realms
             </h2>
-            <RealmMap
-              onRealmSelect={handleRealmSelect}
-              selectedRealm={selectedRealm}
-            />
-          </section>
-
-          {/* Atmosphere Panel */}
-          <section aria-live="polite" className="mb-10">
-            <AtmospherePanel realm={selectedRealm} />
+            <RealmMap />
           </section>
 
           {/* Input Section */}
