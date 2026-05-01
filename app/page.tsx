@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { realms, type Realm } from "@/lib/realms";
-import { RealmCard } from "@/components/realm-card";
+import { RealmMap } from "@/components/realm-map";
 import { AtmospherePanel } from "@/components/atmosphere-panel";
 import { RealmInput } from "@/components/realm-input";
 
@@ -10,8 +10,8 @@ export default function HomePage() {
   const [selectedRealm, setSelectedRealm] = useState<Realm | null>(null);
   const [destination, setDestination] = useState("");
 
-  const handleRealmClick = (realm: Realm) => {
-    setSelectedRealm(selectedRealm?.id === realm.id ? null : realm);
+  const handleRealmSelect = (realm: Realm | null) => {
+    setSelectedRealm(realm);
   };
 
   const handleEnterRealm = () => {
@@ -63,10 +63,10 @@ export default function HomePage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 px-4 py-12 md:py-20">
+      <div className="relative z-10 px-4 py-12 md:py-16">
         <div className="max-w-5xl mx-auto">
           {/* Hero Section */}
-          <header className="text-center mb-16 md:mb-24">
+          <header className="text-center mb-10 md:mb-14">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-[0.2em] text-foreground mb-6 animate-float">
               REALM
             </h1>
@@ -82,25 +82,19 @@ export default function HomePage() {
             </div>
           </header>
 
-          {/* Realm Cards Grid */}
-          <section aria-labelledby="realms-heading" className="mb-12">
+          {/* Interactive Realm Map */}
+          <section aria-labelledby="realms-heading" className="mb-8">
             <h2 id="realms-heading" className="sr-only">
-              Choose a Realm to Explore
+              Explore the Realms
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {realms.map((realm) => (
-                <RealmCard
-                  key={realm.id}
-                  realm={realm}
-                  isSelected={selectedRealm?.id === realm.id}
-                  onClick={() => handleRealmClick(realm)}
-                />
-              ))}
-            </div>
+            <RealmMap
+              onRealmSelect={handleRealmSelect}
+              selectedRealm={selectedRealm}
+            />
           </section>
 
           {/* Atmosphere Panel */}
-          <section aria-live="polite" className="mb-12">
+          <section aria-live="polite" className="mb-10">
             <AtmospherePanel realm={selectedRealm} />
           </section>
 
@@ -114,7 +108,7 @@ export default function HomePage() {
           </section>
 
           {/* Footer decorative element */}
-          <footer className="mt-20 md:mt-32 text-center">
+          <footer className="mt-16 md:mt-24 text-center">
             <div className="inline-flex items-center gap-2 text-muted-foreground/40 text-sm">
               <span className="w-8 h-px bg-border/50" />
               <span>Begin your journey</span>
