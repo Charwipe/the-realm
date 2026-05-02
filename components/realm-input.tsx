@@ -29,14 +29,14 @@ export function RealmInput({ value, onChange, onSubmit }: RealmInputProps) {
         <div className="relative flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <label htmlFor="realm-destination" className="sr-only">
-              Where do you want to go?
+              What do you want to explore?
             </label>
             <input
               id="realm-destination"
               type="text"
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="Where do you want to go?"
+              placeholder="What do you want to explore?"
               className={cn(
                 "w-full px-6 py-4 rounded-xl",
                 "bg-input/50 border border-border/50",
