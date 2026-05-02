@@ -55,23 +55,16 @@ export default function HomePage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 px-4 py-12 md:py-16">
-        <div className="max-w-5xl mx-auto">
+      <div className="relative z-10 px-4 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto">
           {/* Hero Section */}
-          <header className="text-center mb-10 md:mb-14">
+          <header className="text-center mb-6 md:mb-8">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-[0.2em] text-foreground mb-6 animate-float">
               REALM
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-md mx-auto text-pretty">
-              An interactive map of inner experience
+              An interactive map of consciousness
             </p>
-
-            {/* Decorative line */}
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <div className="h-px w-16 bg-gradient-to-r from-transparent to-border" />
-              <div className="w-2 h-2 rounded-full bg-primary/50" />
-              <div className="h-px w-16 bg-gradient-to-l from-transparent to-border" />
-            </div>
           </header>
 
           {/* Interactive Realm Map */}
