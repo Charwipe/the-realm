@@ -30,15 +30,20 @@ export function RealmMap() {
   const router = useRouter();
   const [hoveredRealm, setHoveredRealm] = useState<Realm | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isTopHalf, setIsTopHalf] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent, realm: Realm) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !imageContainerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
+    const imageRect = imageContainerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setTooltipPosition({ x, y });
     setHoveredRealm(realm);
+    // Check if cursor is in top half of image to flip tooltip direction
+    setIsTopHalf((e.clientY - imageRect.top) < (imageRect.height / 2));
   };
 
   const handleMouseLeave = () => {
@@ -52,7 +57,7 @@ export function RealmMap() {
   return (
     <div className="relative w-full max-w-5xl mx-auto" ref={containerRef}>
       {/* Main illustration */}
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/40">
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/40" ref={imageContainerRef}>
         {/* Soft vignette overlay */}
         <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-background/20 via-transparent to-background/40" />
         
@@ -161,19 +166,22 @@ export function RealmMap() {
           })}
         </div>
 
-        {/* Floating tooltip card on hover */}
-        {hoveredRealm && (
-          <div
-            className={cn(
-              "absolute z-30 pointer-events-none",
-              "transform -translate-x-1/2 -translate-y-full",
-              "transition-all duration-300 ease-out"
-            )}
-            style={{
-              left: Math.max(140, Math.min(tooltipPosition.x, containerRef.current ? containerRef.current.offsetWidth - 140 : tooltipPosition.x)),
-              top: Math.max(120, tooltipPosition.y - 20),
-            }}
-          >
+      </div>
+
+      {/* Floating tooltip card on hover - positioned outside overflow container */}
+      {hoveredRealm && (
+        <div
+          className={cn(
+            "absolute z-30 pointer-events-none",
+            "transform -translate-x-1/2",
+            isTopHalf ? "translate-y-4" : "-translate-y-full",
+            "transition-all duration-300 ease-out"
+          )}
+          style={{
+            left: Math.max(140, Math.min(tooltipPosition.x, containerRef.current ? containerRef.current.offsetWidth - 140 : tooltipPosition.x)),
+            top: isTopHalf ? tooltipPosition.y : tooltipPosition.y - 20,
+          }}
+        >
             <div 
               className="relative rounded-2xl p-5 w-64 border backdrop-blur-md"
               style={{
@@ -237,9 +245,14 @@ export function RealmMap() {
                 </p>
               </div>
 
-              {/* Arrow pointer */}
+              {/* Arrow pointer - flips based on tooltip position */}
               <div 
-                className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-4 h-4 rotate-45 border-r border-b backdrop-blur-md"
+                className={cn(
+                  "absolute left-1/2 -translate-x-1/2 w-4 h-4 backdrop-blur-md",
+                  isTopHalf 
+                    ? "-top-2 rotate-45 border-l border-t" 
+                    : "-bottom-2 rotate-45 border-r border-b"
+                )}
                 style={{
                   background: hoveredRealm.id === "ocean-of-being" ? "rgba(30, 58, 95, 0.9)" :
                     hoveredRealm.id === "theatre-of-perception" ? "rgba(74, 29, 75, 0.9)" :
@@ -258,7 +271,6 @@ export function RealmMap() {
             </div>
           </div>
         )}
-      </div>
 
       {/* Realm indicator dots below image */}
       <div className="mt-6 flex items-center justify-center gap-3">
